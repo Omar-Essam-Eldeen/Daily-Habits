@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "app.vercel.daily_habits_five.twa",
+        "sha256_cert_fingerprints": ["32:2E:F6:57:1E:0E:72:32:E6:70:B6:4F:9C:D5:1B:2F:D9:84:5C:D2:88:BE:E7:D9:0D:AB:1D:5C:2E:FE:C4:A2"]
+      }
+    }]
