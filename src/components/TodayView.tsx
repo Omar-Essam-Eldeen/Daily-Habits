@@ -191,7 +191,7 @@ export function TodayView({ selectedDay, onSelectDay }: TodayViewProps) {
               }}
             >
               <Group wrap="nowrap" gap="sm" align="center">
-                <span key={String(checked)} className={checked ? 'check-pop' : undefined}>
+                <span key={String(checked)} className={checked ? 'check-pop' : undefined} aria-hidden="true">
                   <Checkbox
                     checked={checked}
                     readOnly

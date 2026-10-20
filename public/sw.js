@@ -5,7 +5,7 @@
    app when tapped. Reminder payloads are generic — they never contain
    habit data (habit data never leaves the device).
    Bump CACHE_NAME on release. */
-const CACHE_NAME = 'habits-app-v31';
+const CACHE_NAME = 'habits-app-v311';
 
 self.addEventListener('install', (event) => {
   event.waitUntil(

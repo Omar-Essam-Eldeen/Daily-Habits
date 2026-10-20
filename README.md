@@ -8,6 +8,8 @@ Built with **React + Vite + TypeScript + Mantine**. Style: "Clean Social" —
 neutral surfaces, one calm-green accent, rounded cards, pill buttons.
 
 ## What's new in v3.1 — "Cinematic Layers" (design only)
+- **v3.1.1 (a11y hotfix):** the decorative tick-box inside each habit row is now hidden from assistive tech (aria-hidden wrapper) — it was rendering as an unlabelled checkbox input and tripping axe-core's critical "label" rule; the row button remains the single real control. Verified with axe-core: zero `label` and zero critical violations on Today (EN/AR), Progress and Settings.
+
 
 No behaviour or data changes — v3.1 is a pure visual stage over v3:
 

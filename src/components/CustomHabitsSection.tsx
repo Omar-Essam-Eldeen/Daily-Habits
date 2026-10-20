@@ -116,7 +116,7 @@ export function CustomHabitsSection({ selectedDay, locked }: Props) {
               style={{ flex: 1, minWidth: 0, minHeight: 60, padding: '10px 6px 10px 14px' }}
             >
               <Group wrap="nowrap" gap="sm" align="center">
-                <span key={String(checked)} className={checked ? 'check-pop' : undefined}>
+                <span key={String(checked)} className={checked ? 'check-pop' : undefined} aria-hidden="true">
                   <Checkbox
                     checked={checked}
                     readOnly
