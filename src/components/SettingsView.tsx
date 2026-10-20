@@ -31,6 +31,7 @@ import { localeFor } from '../i18n/translations';
 import { TOTAL_DAYS } from '../lib/habits';
 import { sanitizeAppData, type AppData } from '../lib/storage';
 import { useAppData } from '../state/AppDataContext';
+import { PushSettings } from './PushSettings';
 
 /**
  * Settings (v2): grouped into Preferences (language + appearance),
@@ -204,6 +205,8 @@ export function SettingsView() {
           </Text>
         </Stack>
       </Card>
+
+      <PushSettings />
 
       <Card withBorder padding="md">
         <Stack gap="sm">

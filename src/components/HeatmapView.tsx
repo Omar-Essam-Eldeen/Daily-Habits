@@ -18,13 +18,17 @@ import { habitMeta } from '../lib/habitMeta';
 import {
   bestDay,
   currentStreak,
+  customCurrentStreak,
+  customHabitCompletion,
   habitCompletion,
   isChecked,
+  isCustomChecked,
   overallPercent,
   percent,
   totalCompletion,
   weekCompletion,
 } from '../lib/stats';
+import { customIcon } from './customIcons';
 import { useCountUp } from '../hooks/useCountUp';
 import { useAppData } from '../state/AppDataContext';
 
@@ -35,7 +39,7 @@ import { useAppData } from '../state/AppDataContext';
  * Tapping a tile toggles that day for that habit.
  */
 export function HeatmapView() {
-  const { data, toggleCheck } = useAppData();
+  const { data, toggleCheck, toggleCustomCheck } = useAppData();
   const { t, lang } = useLanguage();
   const locale = localeFor(lang);
   const today = todayDayNumber(data.startDate);
@@ -217,6 +221,129 @@ export function HeatmapView() {
           );
         })}
       </Stack>
+
+      {/* v3: custom habits keep their own heatmaps + streaks, fully
+          separate from the challenge score above. */}
+      {data.customHabits.length > 0 && (
+        <>
+          <Text fw={700} size="lg" mt="sm">
+            {t('myHabits')}
+          </Text>
+          <Stack gap="sm">
+            {data.customHabits.map((habit) => {
+              const done = customHabitCompletion(data, habit.id);
+              const habitPct = percent(done, TOTAL_DAYS);
+              const streak = customCurrentStreak(data, habit.id, today);
+              const Icon = customIcon(habit.icon);
+              return (
+                <Card key={habit.id} withBorder padding="md" style={habit.archived ? { opacity: 0.65 } : undefined}>
+                  <Stack gap="sm">
+                    <Group justify="space-between" align="flex-start" wrap="nowrap">
+                      <Group gap="sm" wrap="nowrap" align="flex-start" style={{ flex: 1, minWidth: 0 }}>
+                        <Box
+                          aria-hidden
+                          style={{
+                            width: 38,
+                            height: 38,
+                            borderRadius: 12,
+                            flexShrink: 0,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            background: `var(--mantine-color-${habit.color}-light)`,
+                            color: `var(--mantine-color-${habit.color}-7)`,
+                          }}
+                        >
+                          <Icon size={20} stroke={1.9} />
+                        </Box>
+                        <Stack gap={0} style={{ minWidth: 0 }}>
+                          <Text fw={600} lh={1.3}>
+                            {habit.title}
+                            {habit.archived && (
+                              <Badge size="xs" color="gray" variant="light" ml="xs">
+                                {t('archivedBadge')}
+                              </Badge>
+                            )}
+                          </Text>
+                          <Text size="sm" c="dimmed">
+                            {formatNumber(done, lang)} {t('of')} {formatNumber(TOTAL_DAYS, lang)}{' '}
+                            {t('completion')} · {formatNumber(habitPct, lang)}%
+                          </Text>
+                        </Stack>
+                      </Group>
+                      {streak > 0 && (
+                        <Badge
+                          color="orange"
+                          variant="light"
+                          leftSection={<IconFlame size={13} />}
+                          title={t('streakLabel')}
+                          style={{ flexShrink: 0 }}
+                        >
+                          {formatNumber(streak, lang)} {t('streak')}
+                        </Badge>
+                      )}
+                    </Group>
+
+                    <Progress value={habitPct} color={habit.color} size="sm" radius="xl" />
+
+                    <SimpleGrid cols={7} spacing={6}>
+                      {Array.from({ length: TOTAL_DAYS }, (_, i) => i + 1).map((day) => {
+                        const filled = isCustomChecked(data, day, habit.id);
+                        const isToday = day === today;
+                        const dateLabel = new Intl.DateTimeFormat(locale, {
+                          weekday: 'short',
+                          day: 'numeric',
+                          month: 'short',
+                        }).format(dateOfDay(data.startDate, day));
+                        return (
+                          <Tooltip
+                            key={day}
+                            label={`${dateLabel} · ${t('day')} ${formatNumber(day, lang)} · ${filled ? t('tileDone') : t('tilePending')}`}
+                            position="top"
+                            withArrow
+                            openDelay={350}
+                            closeDelay={50}
+                            events={{ hover: true, focus: true, touch: false }}
+                          >
+                            <button
+                              type="button"
+                              onClick={() => toggleCustomCheck(day, habit.id)}
+                              aria-pressed={filled}
+                              aria-label={`${habit.title} — ${t('day')} ${day} — ${filled ? t('tileDone') : t('tilePending')}`}
+                              className={filled ? 'tile-pop' : undefined}
+                              style={{
+                                height: 40,
+                                minWidth: 0,
+                                borderRadius: 10,
+                                cursor: 'pointer',
+                                fontSize: 12,
+                                fontWeight: 600,
+                                transition: 'background 180ms ease, border-color 180ms ease',
+                                border: filled
+                                  ? `1px solid var(--mantine-color-${habit.color}-6)`
+                                  : '1px solid var(--mantine-color-default-border)',
+                                background: filled
+                                  ? `var(--mantine-color-${habit.color}-6)`
+                                  : 'var(--mantine-color-body)',
+                                color: filled ? '#fff' : 'var(--mantine-color-dimmed)',
+                                boxShadow: isToday
+                                  ? '0 0 0 2px var(--mantine-color-body), 0 0 0 4px var(--mantine-color-leaf-5)'
+                                  : undefined,
+                              }}
+                            >
+                              {formatNumber(day, lang)}
+                            </button>
+                          </Tooltip>
+                        );
+                      })}
+                    </SimpleGrid>
+                  </Stack>
+                </Card>
+              );
+            })}
+          </Stack>
+        </>
+      )}
     </Stack>
   );
 }

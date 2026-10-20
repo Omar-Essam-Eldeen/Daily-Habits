@@ -1,5 +1,11 @@
 import { HABITS, TOTAL_CHECKS, TOTAL_DAYS } from './habits';
-import { checkKey, type AppData } from './storage';
+import {
+  checkKey,
+  customCheckKey,
+  type AppData,
+  type CustomHabit,
+  type DaySubmission,
+} from './storage';
 
 export function isChecked(data: AppData, day: number, habitIndex: number): boolean {
   return data.checks[checkKey(day, habitIndex)] === true;
@@ -79,4 +85,70 @@ export function bestDay(data: AppData): { day: number; done: number } {
     if (done > best.done) best = { day: d, done };
   }
   return best;
+}
+
+/**
+ * Challenge "showed-up" streak ending at `uptoDay`: consecutive days with
+ * at least one CORE habit ticked. Forgiving like everything else here —
+ * an unfinished today (0 ticks so far) never breaks the streak.
+ */
+export function progressStreak(data: AppData, uptoDay: number): number {
+  let day = Math.min(uptoDay, TOTAL_DAYS);
+  if (day >= 1 && dayCompletion(data, day) === 0) day -= 1;
+  let streak = 0;
+  while (day >= 1 && dayCompletion(data, day) > 0) {
+    streak += 1;
+    day -= 1;
+  }
+  return streak;
+}
+
+/* ------------------------------------------------------------------ */
+/* v3: custom habits — their own stats, completely separate from the   */
+/* core challenge score (210 total, milestones, submit score).        */
+/* ------------------------------------------------------------------ */
+
+export function activeCustomHabits(data: AppData): CustomHabit[] {
+  return data.customHabits.filter((h) => !h.archived);
+}
+
+export function isCustomChecked(data: AppData, day: number, customId: string): boolean {
+  return data.customChecks[customCheckKey(day, customId)] === true;
+}
+
+/** Customs ticked on a day (counts habits that still exist, incl. archived). */
+export function customDayCompletion(data: AppData, day: number): number {
+  let done = 0;
+  for (const h of data.customHabits) {
+    if (isCustomChecked(data, day, h.id)) done += 1;
+  }
+  return done;
+}
+
+export function customHabitCompletion(data: AppData, customId: string): number {
+  let done = 0;
+  for (let d = 1; d <= TOTAL_DAYS; d += 1) {
+    if (isCustomChecked(data, d, customId)) done += 1;
+  }
+  return done;
+}
+
+/** Forgiving per-custom streak, same rule as the core per-habit streaks. */
+export function customCurrentStreak(data: AppData, customId: string, uptoDay: number): number {
+  let day = Math.min(uptoDay, TOTAL_DAYS);
+  if (day >= 1 && !isCustomChecked(data, day, customId)) day -= 1;
+  let streak = 0;
+  while (day >= 1 && isCustomChecked(data, day, customId)) {
+    streak += 1;
+    day -= 1;
+  }
+  return streak;
+}
+
+export function submissionFor(data: AppData, day: number): DaySubmission | null {
+  return data.submissions[String(day)] ?? null;
+}
+
+export function isSubmitted(data: AppData, day: number): boolean {
+  return submissionFor(data, day) !== null;
 }

@@ -1,34 +1,50 @@
 import { createTheme, type MantineColorsTuple } from '@mantine/core';
 
 /**
- * Style A "Clean Social": neutral surfaces, ONE calm-green accent, Inter /
- * system font, card radius in the 12–16px band, pill primary buttons,
- * hairline dividers, generous (>=44px) touch targets.
+ * Style A "Clean Social" structure, warmed up for v3 (the siblings'
+ * "plain / sad vibes" fix): the same calm-green anchor (#2f9e44 at shade 6
+ * — the app's brand colour, also the manifest theme colour), but lighter
+ * shades carry a golden tint, a warm amber "sun" joins for celebrations
+ * and gradients, cards round out to 20px, and shadows use a warm
+ * brown-grey instead of v2's cold blue-grey.
  */
 const leaf: MantineColorsTuple = [
-  '#e9f7ee',
-  '#d6efdd',
-  '#b2dfbe',
-  '#86cc99',
-  '#5db878',
-  '#43ab5f',
-  '#2f9e44', // primary shade 6
+  '#eff9e9',
+  '#ddf2d5',
+  '#c0e7ae',
+  '#98d67f',
+  '#72c457',
+  '#57b43c',
+  '#2f9e44', // primary shade 6 — brand anchor (unchanged from v1/v2)
   '#26853a',
   '#1e6c30',
   '#175426',
 ];
 
+const sun: MantineColorsTuple = [
+  '#fff8e1',
+  '#ffecb3',
+  '#ffe082',
+  '#ffd54f',
+  '#ffca28',
+  '#ffc107',
+  '#ffb300',
+  '#ffa000',
+  '#ff8f00',
+  '#ff6f00',
+];
+
 export const theme = createTheme({
-  colors: { leaf },
+  colors: { leaf, sun },
   primaryColor: 'leaf',
   primaryShade: { light: 6, dark: 5 },
-  defaultRadius: 'md',
+  defaultRadius: 'lg',
   shadows: {
-    xs: '0 1px 2px rgba(16, 24, 40, 0.05)',
-    sm: '0 1px 3px rgba(16, 24, 40, 0.06), 0 6px 16px rgba(16, 24, 40, 0.05)',
-    md: '0 2px 6px rgba(16, 24, 40, 0.07), 0 12px 28px rgba(16, 24, 40, 0.07)',
-    lg: '0 4px 10px rgba(16, 24, 40, 0.08), 0 18px 40px rgba(16, 24, 40, 0.09)',
-    xl: '0 8px 16px rgba(16, 24, 40, 0.1), 0 28px 56px rgba(16, 24, 40, 0.1)',
+    xs: '0 1px 2px rgba(66, 52, 20, 0.06)',
+    sm: '0 1px 3px rgba(66, 52, 20, 0.07), 0 6px 16px rgba(66, 52, 20, 0.06)',
+    md: '0 2px 6px rgba(66, 52, 20, 0.08), 0 12px 28px rgba(66, 52, 20, 0.08)',
+    lg: '0 4px 10px rgba(66, 52, 20, 0.09), 0 18px 40px rgba(66, 52, 20, 0.1)',
+    xl: '0 8px 16px rgba(66, 52, 20, 0.11), 0 28px 56px rgba(66, 52, 20, 0.11)',
   },
   fontFamily:
     "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Kufi Arabic', 'Noto Sans Arabic', sans-serif",
@@ -42,10 +58,10 @@ export const theme = createTheme({
       defaultProps: { radius: 'xl' }, // pill buttons
     },
     Card: {
-      defaultProps: { radius: 'lg', withBorder: true, shadow: 'xs' }, // 16px card radius, hairline border, whisper shadow
+      defaultProps: { radius: 'xl', withBorder: true, shadow: 'xs' }, // 20px card radius (v3 warmth), hairline border, whisper shadow
     },
     Paper: {
-      defaultProps: { radius: 'lg' },
+      defaultProps: { radius: 'xl' },
     },
   },
 });

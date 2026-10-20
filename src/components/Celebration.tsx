@@ -16,10 +16,10 @@ interface Piece {
  * ~28 absolutely-positioned pieces animated by a single keyframe. Hidden
  * entirely under prefers-reduced-motion (see styles.css).
  */
-export function Celebration() {
+export function Celebration({ pieces: count = 28 }: { pieces?: number }) {
   const pieces = useMemo<Piece[]>(
     () =>
-      Array.from({ length: 28 }, (_, i) => ({
+      Array.from({ length: count }, (_, i) => ({
         left: (i * 37 + 13) % 100,
         delay: ((i * 53) % 40) / 100,
         size: 6 + ((i * 29) % 7),
@@ -27,7 +27,7 @@ export function Celebration() {
         round: i % 3 === 0,
         duration: 2 + ((i * 31) % 10) / 12,
       })),
-    [],
+    [count],
   );
 
   return (

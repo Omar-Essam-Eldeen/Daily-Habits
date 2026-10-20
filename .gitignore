@@ -3,3 +3,8 @@ dist
 dist-ssr
 *.local
 .DS_Store
+
+# Secrets — never commit real env values (variable names live in .env.example)
+.env
+.env.*
+!.env.example

@@ -3,6 +3,7 @@ import {
   Alert,
   Badge,
   Box,
+  Button,
   Card,
   Checkbox,
   Group,
@@ -12,9 +13,9 @@ import {
   Textarea,
   UnstyledButton,
 } from '@mantine/core';
-import { IconInfoCircle } from '@tabler/icons-react';
+import { IconInfoCircle, IconSend } from '@tabler/icons-react';
 import { useLanguage } from '../i18n/LanguageContext';
-import { formatNumber, localeFor } from '../i18n/translations';
+import { formatNumber, localeFor, type TranslationKey } from '../i18n/translations';
 import {
   dateOfDay,
   formatDayLabel,
@@ -24,12 +25,28 @@ import {
 } from '../lib/dates';
 import { HABITS, MILESTONE_DAYS, TOTAL_DAYS } from '../lib/habits';
 import { habitMeta } from '../lib/habitMeta';
-import { dayCompletion, isChecked, isDayComplete } from '../lib/stats';
+import { markSubmittedToday } from '../lib/push';
+import { dayCompletion, isChecked, isDayComplete, submissionFor } from '../lib/stats';
 import { useCountUp } from '../hooks/useCountUp';
 import { useAppData } from '../state/AppDataContext';
 import { Celebration } from './Celebration';
+import { CustomHabitsSection } from './CustomHabitsSection';
 import { DaySelector } from './DaySelector';
+import { DaySummaryCard } from './DaySummaryCard';
 import { MilestoneBanner, ReminderBanner } from './banners';
+
+function greetingKey(hour: number): TranslationKey {
+  if (hour < 12) return 'greetingMorning';
+  if (hour < 18) return 'greetingAfternoon';
+  return 'greetingEvening';
+}
+
+function greetLineKey(done: number, total: number): TranslationKey {
+  if (done === 0) return 'greetStart';
+  if (done >= total) return 'greetDone';
+  if (done >= total - 3) return 'greetAlmost';
+  return 'greetProgress';
+}
 
 interface TodayViewProps {
   selectedDay: number;
@@ -37,7 +54,7 @@ interface TodayViewProps {
 }
 
 export function TodayView({ selectedDay, onSelectDay }: TodayViewProps) {
-  const { data, toggleCheck, setNote } = useAppData();
+  const { data, toggleCheck, setNote, submitDay } = useAppData();
   const { t, lang } = useLanguage();
   const locale = localeFor(lang);
 
@@ -47,6 +64,22 @@ export function TodayView({ selectedDay, onSelectDay }: TodayViewProps) {
   const dayPct = Math.round((done / HABITS.length) * 100);
   const animatedDayPct = useCountUp(dayPct);
   const note = data.notes[String(selectedDay)] ?? '';
+
+  // v3 daily submit (B1): a submitted day is soft-locked — visibly marked,
+  // ticks paused — until it is re-opened from its summary card.
+  const submission = submissionFor(data, selectedDay);
+  const locked = submission !== null;
+  const canSubmit = !locked && selectedDay <= today;
+  const [submitBurst, setSubmitBurst] = useState(false);
+
+  const handleSubmit = () => {
+    submitDay(selectedDay);
+    markSubmittedToday(); // anonymous "done today" signal — push skips tonight
+    if (isDayComplete(data, selectedDay)) {
+      setSubmitBurst(true);
+      window.setTimeout(() => setSubmitBurst(false), 3000);
+    }
+  };
 
   // Milestone celebration moment: when the viewed day is a milestone day and
   // it is (or becomes) fully ticked, burst confetti once for ~2.8s.
@@ -69,6 +102,13 @@ export function TodayView({ selectedDay, onSelectDay }: TodayViewProps) {
   return (
     <Stack gap="md">
       {celebrating && <Celebration />}
+      {submitBurst && <Celebration pieces={44} />}
+      <Text size="md" fw={600} aria-live="polite">
+        {t(greetingKey(now.getHours()))} —{' '}
+        <Text span fw={400} c="dimmed">
+          {t(greetLineKey(done, HABITS.length))}
+        </Text>
+      </Text>
       <DaySelector selectedDay={selectedDay} onSelect={onSelectDay} />
 
       <div key={selectedDay} className="day-enter">
@@ -136,13 +176,15 @@ export function TodayView({ selectedDay, onSelectDay }: TodayViewProps) {
           return (
             <UnstyledButton
               key={habit.id}
-              onClick={() => toggleCheck(selectedDay, index)}
+              onClick={() => !locked && toggleCheck(selectedDay, index)}
               aria-pressed={checked}
+              disabled={locked}
               style={{
                 width: '100%',
                 minHeight: 60,
                 padding: '10px 14px',
-                borderRadius: 14,
+                borderRadius: 18,
+                opacity: locked ? 0.75 : 1,
                 border: '1px solid var(--mantine-color-default-border)',
                 boxShadow: 'var(--mantine-shadow-xs)',
                 transition: 'background 200ms ease, border-color 200ms ease',
@@ -198,6 +240,8 @@ export function TodayView({ selectedDay, onSelectDay }: TodayViewProps) {
         })}
       </Stack>
 
+      <CustomHabitsSection selectedDay={selectedDay} locked={locked} />
+
       <Textarea
         label={t('noteLabel')}
         placeholder={t('notePlaceholder')}
@@ -206,7 +250,25 @@ export function TodayView({ selectedDay, onSelectDay }: TodayViewProps) {
         autosize
         minRows={2}
         maxRows={6}
+        disabled={locked}
       />
+
+      {submission ? (
+        <DaySummaryCard day={selectedDay} submission={submission} />
+      ) : canSubmit ? (
+        <Button
+          size="lg"
+          radius="xl"
+          fullWidth
+          variant="gradient"
+          gradient={{ from: 'leaf.8', to: 'leaf.7', deg: 90 }}
+          leftSection={<IconSend size={19} />}
+          onClick={handleSubmit}
+          style={{ boxShadow: '0 10px 24px rgba(30, 108, 48, 0.35)' }}
+        >
+          {viewingToday ? t('submitDay') : t('submitDayFor')}
+        </Button>
+      ) : null}
 
           <Text size="xs" c="dimmed" ta="center">
             {formatISODate(dateOfDay(data.startDate, selectedDay))} · {t('endDate')}:{' '}

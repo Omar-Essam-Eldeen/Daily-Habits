@@ -7,6 +7,35 @@ each day, watch the grids fill up, and finish all 21 days.
 Built with **React + Vite + TypeScript + Mantine**. Style: "Clean Social" —
 neutral surfaces, one calm-green accent, rounded cards, pill buttons.
 
+## What's new in v3
+
+- **My habits (custom habits)** — add your own habits beside the core 10,
+  each with its own icon, colour, mini 3×7 heatmap and forgiving streak.
+  Habits are **archived, never hard-deleted**, so history is never lost.
+  Customs live in a separate collection with permanent IDs and **never
+  count** toward the 210 total, milestones, or the challenge score/streak
+  — the core 10 define the challenge, as always.
+- **Daily submit** — a "Submit today's results" button closes the day with
+  a shareable summary card (core score x/10, customs listed separately,
+  streak, day note; Share / Copy buttons). Submitting **soft-locks** the
+  day; "Re-open day" undoes it any time with no penalty.
+- **Real phone reminders (Web Push)** — optional, free-tier: Vercel
+  serverless functions (`api/`) + Upstash Redis + an hourly QStash
+  schedule send one generic reminder at the chosen time (21:00 default) if
+  the day isn't submitted. Only an anonymous push subscription ever
+  leaves the device — **habit data never does**. Without the backend
+  configured, the app falls back to the in-app banner. Setup:
+  [`PUSH-SETUP.md`](PUSH-SETUP.md); env var names: [`.env.example`](.env.example).
+- **Warmth pass** — warmer green/paper tones, 20px cards, a challenge
+  progress ring in the header, a greeting that reacts to the day's
+  progress, livelier celebration, friendlier empty states.
+- **Data compatibility** — v1/v2 data and backups keep working: the
+  storage key is unchanged, loading a v1/v2 document migrates it in place
+  (customs/submissions default empty), the raw pre-upgrade document is
+  automatically backed up under a separate localStorage key, and v3's
+  importer accepts v1/v2/v3 exports alike. v3 exports also still load in
+  v2 (custom habits are simply ignored there).
+
 ## Run it
 
 ```bash
@@ -37,8 +66,9 @@ Then open it on your phone or desktop browser and use **"Add to Home Screen" /
   zero-reset punishment** anywhere in the app.
 - **Milestones** — celebration banners for days **7, 14 and 21** (rule below).
 - **Day notes** — a free-text note per day, saved automatically.
-- **Reminder (in-app only)** — set a daily time in Settings; while the app is
-  open, if that time passes and today is incomplete, a gentle banner appears.
+- **Reminder** — set a daily time in Settings; while the app is open, if
+  that time passes and today is incomplete, a gentle banner appears. v3 can
+  also send a real phone pop-up at that time (optional, see PUSH-SETUP.md).
 - **Backup** — Export downloads a JSON backup; Import validates a backup file
   and asks for confirmation **before** replacing anything.
 - **Reset** — clears all ticks and notes (with a confirmation modal); language
@@ -87,11 +117,13 @@ the three has its own message). Completing day 21 fully shows the
   Settings. Ticks belong to day numbers (1–21), so changing the start date
   re-dates the challenge without losing ticks.
 
-## Known limits (v1)
+## Known limits
 
-- **No push notifications** — reminders are in-app banners only, and only
-  while the app is open. Real push needs a server/push service; deliberately
-  out of scope for a local-only v1.
+- **Push is opt-in and best-effort** — real phone reminders (v3) need the
+  free backend in PUSH-SETUP.md to be connected once; without it, reminders
+  are the in-app banner only. Even connected, delivery is the push
+  service's best effort (Focus / Do-Not-Disturb can delay it), and on
+  iPhone it works only from the home-screen-installed app (iOS 16.4+).
 - Installability is "PWA basics": manifest + icons + a minimal service
   worker. A full offline precache of hashed assets and install prompts can
   be polished in v2.

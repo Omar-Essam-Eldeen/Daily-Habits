@@ -133,3 +133,25 @@ input[type='time'] {
     display: none;
   }
 }
+
+/* v3 warmth: a warm-paper page background in light mode, a soft warm
+   charcoal in dark mode (content cards sit on Mantine's own body colour). */
+[data-mantine-color-scheme='light'] body {
+  background-color: #fffaf1;
+}
+
+[data-mantine-color-scheme='dark'] body {
+  background-color: #16130f;
+}
+
+::selection {
+  background: var(--mantine-color-sun-3);
+}
+
+/* Visible focus for keyboard users on every interactive element, in both
+   schemes and in RTL — Mantine styles many of these already; this is the
+   guaranteed floor. */
+:focus-visible {
+  outline: 2px solid var(--mantine-color-leaf-6);
+  outline-offset: 2px;
+}

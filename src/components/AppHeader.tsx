@@ -1,18 +1,22 @@
 import {
   Box,
   Group,
+  RingProgress,
   SegmentedControl,
   Stack,
   Text,
   Title,
+  Tooltip,
   useMantineColorScheme,
   type MantineColorScheme,
 } from '@mantine/core';
 import { IconCheck, IconDeviceDesktop, IconMoon, IconSun } from '@tabler/icons-react';
 import { useLanguage } from '../i18n/LanguageContext';
 import { formatNumber } from '../i18n/translations';
+import { useCountUp } from '../hooks/useCountUp';
 import { todayDayNumber } from '../lib/dates';
 import { TOTAL_DAYS } from '../lib/habits';
+import { overallPercent } from '../lib/stats';
 import { useAppData } from '../state/AppDataContext';
 
 export function AppHeader() {
@@ -20,6 +24,8 @@ export function AppHeader() {
   const { colorScheme, setColorScheme } = useMantineColorScheme();
   const { data } = useAppData();
   const today = todayDayNumber(data.startDate);
+  const challengePct = overallPercent(data);
+  const animatedChallengePct = useCountUp(challengePct);
 
   return (
     <Stack gap="sm">
@@ -50,6 +56,26 @@ export function AppHeader() {
               {formatNumber(TOTAL_DAYS, lang)}
             </Text>
           </Stack>
+          {/* v3: challenge progress ring — the whole 21 days at a glance. */}
+          <Tooltip label={t('challengeRingLabel')} position="bottom" withArrow>
+            <Box
+              role="img"
+              aria-label={`${t('challengeRingLabel')}: ${challengePct}%`}
+              style={{ flexShrink: 0 }}
+            >
+              <RingProgress
+                size={52}
+                thickness={6}
+                roundCaps
+                sections={[{ value: challengePct, color: 'leaf' }]}
+                label={
+                  <Text ta="center" size="xs" fw={700}>
+                    {formatNumber(animatedChallengePct, lang)}%
+                  </Text>
+                }
+              />
+            </Box>
+          </Tooltip>
         </Group>
 
         <Group gap="xs" wrap="wrap">

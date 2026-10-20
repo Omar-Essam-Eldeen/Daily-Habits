@@ -1,11 +1,11 @@
-# Put the Habits App (v2) online free with Vercel (Egypt-friendly)
+# Put the Habits App (v3) online free with Vercel (Egypt-friendly)
 
 Same hosting switch as the Converter App: Netlify is unreliable from Egypt
 (its sites are blocked at ISP level for many Egyptian users and only open
 through a VPN), so we host on **Vercel** instead. Vercel's free "Hobby" plan
 is enough — this is a personal, non-commercial app.
 
-This v2 project now contains a `vercel.json` with the right build settings
+This v3 project now contains a `vercel.json` with the right build settings
 and service-worker headers (the same setup the Converter App got), so Vercel
 should need almost no configuration.
 
@@ -79,3 +79,11 @@ chat tracker — just go straight to the deploy steps.
 After the first visit the app is cached on the device and works fully
 offline — no internet needed to tick your habits. Nothing is uploaded:
 your ticks never leave the device they were ticked on.
+
+## Optional: switch on real phone reminders (v3)
+
+The `api/` functions deploy automatically with the project. To activate
+phone push (free tiers only: Upstash Redis + QStash), follow
+[`PUSH-SETUP.md`](PUSH-SETUP.md) — create the free database, add the env
+vars in Vercel, create the hourly QStash schedule, redeploy. Until then
+the app simply uses its in-app reminder banner; nothing breaks.
