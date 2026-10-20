@@ -14,6 +14,7 @@ import { HABITS, TOTAL_DAYS } from '../lib/habits';
 import { progressStreak } from '../lib/stats';
 import type { DaySubmission } from '../lib/storage';
 import { useAppData } from '../state/AppDataContext';
+import { LogoMark } from './Logo';
 
 interface Props {
   day: number;
@@ -113,14 +114,17 @@ export function DaySummaryCard({ day, submission }: Props) {
     const H = 400 + noteLines.length * 40;
     const x = rtl ? W - 56 : 56;
     const anchor = rtl ? 'end' : 'start';
+    const cx = rtl ? 84 : W - 84; // logo disc centre (top corner)
     const svg = [
       `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">`,
       '<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">',
       '<stop offset="0" stop-color="#1e6c30"/><stop offset="1" stop-color="#2f9e44"/>',
       '</linearGradient></defs>',
       `<rect width="${W}" height="${H}" rx="36" fill="url(#g)"/>`,
-      `<circle cx="${rtl ? 84 : W - 84}" cy="86" r="42" fill="#ffc107" opacity="0.9"/>`,
-      `<text x="${rtl ? 84 : W - 84}" y="102" font-size="40" text-anchor="middle">✓</text>`,
+      // v3.1 logo motif in the corner: gold sun disc, cream leaf, green check vein.
+      `<circle cx="${cx}" cy="86" r="42" fill="#ffc107" opacity="0.9"/>`,
+      `<path d="M${cx - 21} 103 C${cx - 21} 88 ${cx - 9} 79 ${cx + 17} 77 C${cx + 19} 92 ${cx + 12} 103 ${cx - 6} 105 C${cx - 15} 106 ${cx - 21} 107 ${cx - 21} 103 Z" fill="#fff8e1"/>`,
+      `<path d="M${cx - 13} 97 L${cx - 4} 103 L${cx + 13} 83" fill="none" stroke="#1e6c30" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>`,
       `<text x="${x}" y="96" font-family="system-ui, 'Segoe UI', Arial, sans-serif" font-size="42" font-weight="700" fill="#ffffff" text-anchor="${anchor}">${esc(t('appTitle'))}</text>`,
       `<text x="${x}" y="142" font-family="system-ui, 'Segoe UI', Arial, sans-serif" font-size="27" fill="#dcf2d5" text-anchor="${anchor}">${esc(t('day'))} ${day}/${TOTAL_DAYS} · ${esc(t('submittedBadge'))}${submittedTime ? ' · ' + esc(submittedTime) : ''}</text>`,
       `<text x="${x}" y="262" font-family="system-ui, 'Segoe UI', Arial, sans-serif" font-size="110" font-weight="800" fill="#ffffff" text-anchor="${anchor}">${submission.coreDone}<tspan font-size="52" fill="#dcf2d5">/${HABITS.length}</tspan></text>`,
@@ -167,14 +171,20 @@ export function DaySummaryCard({ day, submission }: Props) {
       withBorder
       padding="md"
       radius="xl"
-      className="rise-in"
+      className="glass-surface rise-in"
       style={{
-        borderColor: 'var(--mantine-color-leaf-4)',
-        background:
-          'linear-gradient(135deg, var(--mantine-color-leaf-light) 0%, var(--mantine-color-body) 70%)',
+        borderColor: 'var(--glass-border-gold)',
+        background: 'var(--glass-summary-bg)',
       }}
     >
       <Stack gap="sm">
+        {/* v3.1 identity: brand lockup at the top of the shareable card. */}
+        <Group gap="xs" align="center">
+          <LogoMark size={26} />
+          <Text size="sm" fw={700}>
+            {t('appTitle')}
+          </Text>
+        </Group>
         <Group justify="space-between" align="center">
           <Group gap="xs">
             <IconTrophy size={20} color="var(--mantine-color-leaf-7)" aria-hidden />

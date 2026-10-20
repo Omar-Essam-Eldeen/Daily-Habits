@@ -27,7 +27,13 @@ export function MilestoneBanner({ day }: { day: number }) {
   const key = MILESTONE_KEYS[day];
   if (!key) return null;
   return (
-    <Alert color="leaf" variant="light" icon={<IconTrophy size={18} />} title={t('milestoneBadge')}>
+    <Alert
+      color="leaf"
+      variant="light"
+      icon={<IconTrophy size={18} />}
+      title={t('milestoneBadge')}
+      className="milestone-banner"
+    >
       {t(key)}
     </Alert>
   );

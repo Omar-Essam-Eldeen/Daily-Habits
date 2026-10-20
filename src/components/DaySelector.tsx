@@ -32,6 +32,7 @@ export function DaySelector({ selectedDay, onSelect }: DaySelectorProps) {
                 key={day}
                 onClick={() => onSelect(day)}
                 aria-pressed={selected}
+                className="lift"
                 style={{
                   minWidth: 58,
                   minHeight: 56,
@@ -40,13 +41,17 @@ export function DaySelector({ selectedDay, onSelect }: DaySelectorProps) {
                   textAlign: 'center',
                   transition: 'background 180ms ease, box-shadow 180ms ease, transform 120ms ease',
                   border: selected
-                    ? '1px solid var(--mantine-color-leaf-6)'
-                    : '1px solid var(--mantine-color-default-border)',
+                    ? '1px solid var(--mantine-color-leaf-7)'
+                    : '1px solid var(--glass-border)',
+                  // v3.1: selected day wears the sunrise gradient + glow;
+                  // unselected days are warm glass.
                   background: selected
-                    ? 'var(--mantine-color-leaf-6)'
-                    : 'var(--mantine-color-body)',
+                    ? 'linear-gradient(135deg, var(--mantine-color-leaf-5), var(--mantine-color-leaf-7))'
+                    : 'var(--glass-row-bg)',
                   color: selected ? '#fff' : undefined,
-                  boxShadow: selected ? '0 6px 16px rgba(47, 158, 68, 0.35)' : undefined,
+                  boxShadow: selected
+                    ? '0 8px 18px rgba(47, 158, 68, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3)'
+                    : undefined,
                 }}
               >
                 <Text size="lg" fw={700} lh={1.1} c={selected ? 'white' : undefined}>

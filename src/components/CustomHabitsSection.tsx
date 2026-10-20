@@ -24,6 +24,8 @@ import { todayDayNumber } from '../lib/dates';
 import { formatNumber } from '../i18n/translations';
 import { useAppData, type CustomHabitDraft } from '../state/AppDataContext';
 import { CUSTOM_ICON_KEYS, customIcon } from './customIcons';
+import { chipArt } from '../lib/colorArt';
+import { LogoMark } from './Logo';
 
 interface Props {
   selectedDay: number;
@@ -73,14 +75,18 @@ export function CustomHabitsSection({ selectedDay, locked }: Props) {
 
       {actives.length === 0 && (
         <Box
+          className="glass-surface"
           style={{
             border: '1.5px dashed var(--mantine-color-leaf-4)',
             borderRadius: 18,
             padding: '14px 16px',
-            background: 'var(--mantine-color-leaf-light)',
+            background: 'var(--glass-row-bg)',
           }}
         >
-          <Text size="sm">{t('noCustomHabits')}</Text>
+          <Group gap="sm" wrap="nowrap" align="center">
+            <LogoMark size={34} />
+            <Text size="sm">{t('noCustomHabits')}</Text>
+          </Group>
         </Box>
       )}
 
@@ -94,12 +100,11 @@ export function CustomHabitsSection({ selectedDay, locked }: Props) {
             wrap="nowrap"
             gap="xs"
             align="stretch"
+            className="glass-surface glass-row lift"
             style={{
-              border: '1px solid var(--mantine-color-default-border)',
+              border: '1px solid var(--glass-border)',
               borderRadius: 18,
-              boxShadow: 'var(--mantine-shadow-xs)',
-              background: checked ? 'var(--mantine-color-leaf-light)' : 'var(--mantine-color-body)',
-              transition: 'background 200ms ease',
+              background: checked ? 'var(--glass-row-bg-checked)' : 'var(--glass-row-bg)',
               overflow: 'hidden',
             }}
           >
@@ -133,8 +138,7 @@ export function CustomHabitsSection({ selectedDay, locked }: Props) {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    background: `var(--mantine-color-${habit.color}-light)`,
-                    color: `var(--mantine-color-${habit.color}-7)`,
+                    ...chipArt(habit.color),
                   }}
                 >
                   <Icon size={21} stroke={1.9} />
@@ -219,9 +223,8 @@ export function CustomHabitsSection({ selectedDay, locked }: Props) {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      background: `var(--mantine-color-${habit.color}-light)`,
-                      color: `var(--mantine-color-${habit.color}-7)`,
                       flexShrink: 0,
+                      ...chipArt(habit.color),
                     }}
                   >
                     <Icon size={18} />
@@ -309,6 +312,7 @@ function HabitEditor({
             {CUSTOM_ICON_KEYS.map((key) => {
               const Icon = customIcon(key);
               const selected = icon === key;
+              const art = chipArt(color);
               return (
                 <UnstyledButton
                   key={key}
@@ -324,8 +328,11 @@ function HabitEditor({
                     border: selected
                       ? '2px solid var(--mantine-color-leaf-6)'
                       : '1px solid var(--mantine-color-default-border)',
-                    background: selected ? 'var(--mantine-color-leaf-light)' : undefined,
-                    color: 'var(--mantine-color-text)',
+                    // v3.1: the selected picker chip wears the chosen
+                    // colour's gradient, like the habit rows do.
+                    background: selected ? art.background : undefined,
+                    color: selected ? art.color : 'var(--mantine-color-text)',
+                    boxShadow: selected ? art.boxShadow : undefined,
                   }}
                 >
                   <Icon size={20} />

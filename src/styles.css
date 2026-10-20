@@ -1,4 +1,7 @@
-/* Small global touches on top of Mantine — v2 adds motion + polish. */
+/* Global styles on top of Mantine.
+   v3.1 "Cinematic Layers": layered sunrise gradient fields, glass surfaces
+   with real depth, a glowing progress ring, layered celebrations. All
+   motion is transform/opacity only and dies under prefers-reduced-motion. */
 
 html {
   -webkit-tap-highlight-color: transparent;
@@ -23,12 +26,20 @@ input[type='time'] {
    so a CSS transition on the rendered elements animates them). */
 .mantine-Progress-section {
   transition: width 650ms cubic-bezier(0.22, 1, 0.36, 1);
+  /* v3.1: glossy sheen over every progress fill (hue comes from the bar's
+     own colour underneath). */
+  background-image: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.38),
+    rgba(255, 255, 255, 0.05) 55%,
+    rgba(0, 0, 0, 0.06)
+  );
 }
 .mantine-RingProgress-svg circle {
   transition: stroke-dashoffset 650ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* ---- v2 micro-animations ---- */
+/* ---- micro-animations (v2, kept) ---- */
 
 @keyframes check-pop {
   0% {
@@ -89,13 +100,294 @@ input[type='time'] {
   animation: rise-in 380ms ease-out both;
 }
 
-/* Milestone confetti (Celebration.tsx) */
+/* ---- v3.1 Cinematic Layers ---- */
+
+/* Scheme tokens: glass surfaces, focus ring, secondary-text legibility.
+   --mantine-color-dimmed is deepened/lightened from the Mantine default so
+   secondary text keeps >= 4.5:1 on the glass/gradient backgrounds
+   (default gray-6 on warm paper measured only ~3.3:1). */
+:root[data-mantine-color-scheme='light'] {
+  --focus-ring: #1e6c30;
+  --mantine-color-dimmed: #5a656e;
+  --glass-card-bg: linear-gradient(165deg, rgba(255, 255, 255, 0.86), rgba(255, 250, 238, 0.74));
+  --glass-row-bg: linear-gradient(165deg, rgba(255, 255, 255, 0.8), rgba(255, 251, 240, 0.64));
+  --glass-row-bg-checked: linear-gradient(165deg, rgba(216, 241, 207, 0.9), rgba(193, 231, 181, 0.74));
+  --glass-border: rgba(122, 92, 30, 0.16);
+  --glass-border-gold: rgba(214, 164, 32, 0.45);
+  --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  --glass-shadow-lift: 0 4px 8px rgba(66, 52, 20, 0.07), 0 20px 38px rgba(66, 52, 20, 0.13);
+  --glass-summary-bg: linear-gradient(
+    130deg,
+    rgba(209, 238, 198, 0.96),
+    rgba(255, 246, 220, 0.96) 62%,
+    rgba(255, 238, 196, 0.96)
+  );
+  background-color: #fff8ea;
+}
+
+:root[data-mantine-color-scheme='dark'] {
+  --focus-ring: #98d67f;
+  --mantine-color-dimmed: #a8adb3;
+  --glass-card-bg: linear-gradient(165deg, rgba(54, 45, 33, 0.9), rgba(35, 29, 22, 0.86));
+  --glass-row-bg: linear-gradient(165deg, rgba(54, 45, 33, 0.87), rgba(37, 31, 23, 0.82));
+  --glass-row-bg-checked: linear-gradient(165deg, rgba(36, 68, 42, 0.9), rgba(27, 52, 32, 0.84));
+  --glass-border: rgba(255, 205, 130, 0.15);
+  --glass-border-gold: rgba(255, 183, 28, 0.32);
+  --glass-highlight: inset 0 1px 0 rgba(255, 224, 170, 0.1);
+  --glass-shadow-lift: 0 4px 10px rgba(0, 0, 0, 0.35), 0 22px 42px rgba(0, 0, 0, 0.4);
+  --glass-summary-bg: linear-gradient(
+    130deg,
+    rgba(33, 66, 40, 0.96),
+    rgba(58, 44, 20, 0.96) 62%,
+    rgba(46, 35, 16, 0.96)
+  );
+  background-color: #16130f;
+}
+
+/* Layered sunrise field painted on the page itself (static base layer). */
+[data-mantine-color-scheme='light'] body {
+  background:
+    radial-gradient(1100px 520px at 88% -8%, rgba(255, 183, 77, 0.38), rgba(255, 183, 77, 0) 62%),
+    radial-gradient(900px 620px at -12% 108%, rgba(87, 180, 60, 0.2), rgba(87, 180, 60, 0) 60%),
+    radial-gradient(700px 480px at 108% 62%, rgba(255, 138, 101, 0.14), rgba(255, 138, 101, 0) 60%),
+    linear-gradient(180deg, #fff8ea 0%, #fffaf1 46%, #fdefdb 100%);
+  background-attachment: fixed;
+}
+
+[data-mantine-color-scheme='dark'] body {
+  background:
+    radial-gradient(1000px 520px at 88% -8%, rgba(255, 143, 0, 0.17), rgba(255, 143, 0, 0) 62%),
+    radial-gradient(900px 620px at -12% 108%, rgba(47, 158, 68, 0.15), rgba(47, 158, 68, 0) 60%),
+    radial-gradient(700px 480px at 108% 62%, rgba(255, 112, 67, 0.09), rgba(255, 112, 67, 0) 60%),
+    linear-gradient(180deg, #1c1610 0%, #16130f 52%, #100d09 100%);
+  background-attachment: fixed;
+}
+
+/* Drifting glow layer above the base field, behind all content. */
+.cinematic-field {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  background: radial-gradient(620px 380px at 108% 58%, rgba(255, 138, 101, 0.13), rgba(255, 138, 101, 0) 65%);
+}
+.cinematic-field::before,
+.cinematic-field::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+}
+.cinematic-field::before {
+  width: 115vmax;
+  height: 115vmax;
+  top: -62vmax;
+  inset-inline-start: -28vmax;
+  background: radial-gradient(closest-side, rgba(255, 196, 86, 0.3), rgba(255, 196, 86, 0) 72%);
+  animation: field-drift-a 46s ease-in-out infinite alternate;
+}
+.cinematic-field::after {
+  width: 95vmax;
+  height: 95vmax;
+  bottom: -55vmax;
+  inset-inline-end: -25vmax;
+  background: radial-gradient(closest-side, rgba(87, 180, 60, 0.2), rgba(87, 180, 60, 0) 72%);
+  animation: field-drift-b 58s ease-in-out infinite alternate;
+}
+[data-mantine-color-scheme='dark'] .cinematic-field {
+  background: radial-gradient(620px 380px at 108% 58%, rgba(255, 112, 67, 0.08), rgba(255, 112, 67, 0) 65%);
+}
+[data-mantine-color-scheme='dark'] .cinematic-field::before {
+  background: radial-gradient(closest-side, rgba(255, 150, 40, 0.15), rgba(255, 150, 40, 0) 72%);
+}
+[data-mantine-color-scheme='dark'] .cinematic-field::after {
+  background: radial-gradient(closest-side, rgba(47, 158, 68, 0.14), rgba(47, 158, 68, 0) 72%);
+}
+@keyframes field-drift-a {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  to {
+    transform: translate3d(2.6%, 1.6%, 0) scale(1.045);
+  }
+}
+@keyframes field-drift-b {
+  from {
+    transform: translate3d(0, 0, 0) scale(1.03);
+  }
+  to {
+    transform: translate3d(-2.2%, -1.4%, 0) scale(1);
+  }
+}
+
+/* Glass surfaces: every Mantine Card becomes a glass panel (summary card
+   keeps its own richer inline gradient). */
+.mantine-Card-root {
+  background: var(--glass-card-bg);
+  -webkit-backdrop-filter: blur(12px) saturate(1.25);
+  backdrop-filter: blur(12px) saturate(1.25);
+  border-color: var(--glass-border);
+  box-shadow:
+    var(--glass-highlight),
+    0 1px 2px rgba(66, 52, 20, 0.05),
+    0 14px 30px rgba(66, 52, 20, 0.09);
+}
+[data-mantine-color-scheme='dark'] .mantine-Card-root {
+  box-shadow:
+    var(--glass-highlight),
+    0 1px 2px rgba(0, 0, 0, 0.3),
+    0 16px 34px rgba(0, 0, 0, 0.35);
+}
+
+/* Glass for the hand-rolled rows (habit rows, custom rows, day pills). */
+.glass-surface {
+  -webkit-backdrop-filter: blur(12px) saturate(1.25);
+  backdrop-filter: blur(12px) saturate(1.25);
+}
+.glass-row {
+  box-shadow: var(--glass-highlight), var(--mantine-shadow-sm);
+}
+
+/* Micro-depth: lift on hover (pointer-fine devices), settle on press. */
+.lift {
+  transition:
+    transform 180ms ease,
+    box-shadow 220ms ease,
+    background 200ms ease,
+    border-color 200ms ease;
+}
+@media (hover: hover) {
+  .lift:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--glass-highlight), var(--glass-shadow-lift);
+  }
+}
+.lift:active {
+  transform: translateY(0) scale(0.993);
+}
+
+/* Glowing progress rings (header challenge ring + day ring). The section
+   stroke is repainted with the sunrise gradient defined in AppHeader. */
+.ring-glow {
+  position: relative;
+  border-radius: 50%;
+}
+.ring-glow svg {
+  filter:
+    drop-shadow(0 0 5px rgba(255, 179, 0, 0.45))
+    drop-shadow(0 2px 8px rgba(47, 158, 68, 0.35));
+}
+.ring-glow .mantine-RingProgress-curve[style*='--curve-color'] {
+  stroke: url(#habits-ring-gradient);
+}
+.ring-glow.pulsing svg {
+  animation: ring-pulse 900ms ease-out;
+}
+@keyframes ring-pulse {
+  0% {
+    transform: scale(1);
+    filter:
+      drop-shadow(0 0 5px rgba(255, 179, 0, 0.45))
+      drop-shadow(0 2px 8px rgba(47, 158, 68, 0.35));
+  }
+  35% {
+    transform: scale(1.08);
+    filter:
+      drop-shadow(0 0 14px rgba(255, 179, 0, 0.85))
+      drop-shadow(0 4px 16px rgba(47, 158, 68, 0.55));
+  }
+  100% {
+    transform: scale(1);
+    filter:
+      drop-shadow(0 0 5px rgba(255, 179, 0, 0.45))
+      drop-shadow(0 2px 8px rgba(47, 158, 68, 0.35));
+  }
+}
+
+/* Milestone banner: layered light rays behind the message + warm glow. */
+.milestone-banner {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 183, 28, 0.45);
+  background: linear-gradient(
+    115deg,
+    rgba(223, 242, 213, 0.94),
+    rgba(255, 243, 205, 0.94) 55%,
+    rgba(223, 242, 213, 0.94)
+  );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    0 8px 26px rgba(255, 167, 0, 0.22);
+}
+[data-mantine-color-scheme='dark'] .milestone-banner {
+  border-color: rgba(255, 183, 28, 0.3);
+  background: linear-gradient(
+    115deg,
+    rgba(30, 64, 36, 0.94),
+    rgba(74, 54, 14, 0.94) 55%,
+    rgba(30, 64, 36, 0.94)
+  );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 224, 170, 0.12),
+    0 8px 26px rgba(0, 0, 0, 0.35);
+}
+.milestone-banner::before {
+  content: '';
+  position: absolute;
+  inset: -45%;
+  background: repeating-conic-gradient(
+    from 0deg at 50% 50%,
+    rgba(255, 183, 28, 0.13) 0deg 7deg,
+    transparent 7deg 22deg
+  );
+  animation: rays-spin 26s linear infinite;
+  pointer-events: none;
+}
+.milestone-banner > * {
+  position: relative;
+}
+@keyframes rays-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Celebration (Celebration.tsx): light rays + flash + two confetti depths. */
 .confetti-wrap {
   position: fixed;
   inset: 0;
   overflow: hidden;
   pointer-events: none;
   z-index: 300;
+}
+.celebration-rays {
+  position: absolute;
+  left: 50%;
+  top: -34vmax;
+  width: 150vmax;
+  height: 150vmax;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: repeating-conic-gradient(
+    from 0deg at 50% 50%,
+    rgba(255, 196, 64, 0.13) 0deg 6deg,
+    transparent 6deg 20deg
+  );
+  animation: rays-spin 30s linear infinite;
+}
+.celebration-flash {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(60% 45% at 50% 0%, rgba(255, 214, 120, 0.5), transparent 70%);
+  animation: celebration-flash 1000ms ease-out forwards;
+}
+@keyframes celebration-flash {
+  from {
+    opacity: 0.85;
+  }
+  to {
+    opacity: 0;
+  }
 }
 .confetti-piece {
   position: absolute;
@@ -104,6 +396,13 @@ input[type='time'] {
   animation-name: confetti-fall;
   animation-timing-function: cubic-bezier(0.25, 0.6, 0.45, 1);
   animation-fill-mode: forwards;
+}
+.confetti-piece.back {
+  filter: blur(1.1px);
+  opacity: 0.55;
+}
+.confetti-piece.front {
+  box-shadow: 0 1px 3px rgba(60, 40, 0, 0.25);
 }
 @keyframes confetti-fall {
   0% {
@@ -118,8 +417,26 @@ input[type='time'] {
     opacity: 0;
   }
 }
+.confetti-piece.back {
+  animation-name: confetti-fall-back;
+}
+@keyframes confetti-fall-back {
+  0% {
+    transform: translate3d(0, -14px, 0) rotate(0deg);
+    opacity: 0.55;
+  }
+  85% {
+    opacity: 0.55;
+  }
+  100% {
+    transform: translate3d(8px, 104vh, 0) rotate(430deg);
+    opacity: 0;
+  }
+}
 
-/* Respect users who ask the OS for less motion: kill the flourishes. */
+/* Respect users who ask the OS for less motion: kill the flourishes
+   (the drifting field, rays and confetti all freeze/vanish; the glass and
+   gradients — pure appearance — remain). */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -134,24 +451,23 @@ input[type='time'] {
   }
 }
 
-/* v3 warmth: a warm-paper page background in light mode, a soft warm
-   charcoal in dark mode (content cards sit on Mantine's own body colour). */
-[data-mantine-color-scheme='light'] body {
-  background-color: #fffaf1;
-}
-
-[data-mantine-color-scheme='dark'] body {
-  background-color: #16130f;
-}
-
 ::selection {
   background: var(--mantine-color-sun-3);
 }
 
 /* Visible focus for keyboard users on every interactive element, in both
-   schemes and in RTL — Mantine styles many of these already; this is the
-   guaranteed floor. */
+   schemes and in RTL — the ring colour is scheme-tuned (--focus-ring) so it
+   stays >= 3:1 against the gradient field and the glass. */
 :focus-visible {
-  outline: 2px solid var(--mantine-color-leaf-6);
+  outline: 2px solid var(--focus-ring, var(--mantine-color-leaf-6));
   outline-offset: 2px;
+}
+
+/* Mantine's input rule strips the outline on text inputs/textareas
+   (specificity beats the global rule above) — restore a visible ring so
+   keyboard users can see focus in the note field and form inputs. */
+input.mantine-Input-input:focus-visible,
+textarea.mantine-Input-input:focus-visible {
+  outline: 2px solid var(--focus-ring, var(--mantine-color-leaf-6));
+  outline-offset: 0;
 }

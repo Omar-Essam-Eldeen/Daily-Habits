@@ -24,13 +24,13 @@ import {
   todayDayNumber,
 } from '../lib/dates';
 import { HABITS, MILESTONE_DAYS, TOTAL_DAYS } from '../lib/habits';
-import { habitMeta } from '../lib/habitMeta';
 import { markSubmittedToday } from '../lib/push';
 import { dayCompletion, isChecked, isDayComplete, submissionFor } from '../lib/stats';
 import { useCountUp } from '../hooks/useCountUp';
 import { useAppData } from '../state/AppDataContext';
 import { Celebration } from './Celebration';
 import { CustomHabitsSection } from './CustomHabitsSection';
+import { HabitArt } from './HabitArt';
 import { DaySelector } from './DaySelector';
 import { DaySummaryCard } from './DaySummaryCard';
 import { MilestoneBanner, ReminderBanner } from './banners';
@@ -154,43 +154,40 @@ export function TodayView({ selectedDay, onSelectDay }: TodayViewProps) {
               </Text>
             )}
           </Stack>
-          <RingProgress
-            size={76}
-            thickness={8}
-            roundCaps
-            sections={[{ value: dayPct, color: 'leaf' }]}
-            label={
-              <Text ta="center" size="sm" fw={700}>
-                {formatNumber(animatedDayPct, lang)}%
-              </Text>
-            }
-          />
+          <Box className="ring-glow" style={{ flexShrink: 0 }}>
+            <RingProgress
+              size={76}
+              thickness={8}
+              roundCaps
+              sections={[{ value: dayPct, color: 'leaf' }]}
+              label={
+                <Text ta="center" size="sm" fw={700}>
+                  {formatNumber(animatedDayPct, lang)}%
+                </Text>
+              }
+            />
+          </Box>
         </Group>
       </Card>
 
       <Stack gap="xs">
         {HABITS.map((habit, index) => {
           const checked = isChecked(data, selectedDay, index);
-          const meta = habitMeta(habit.id);
-          const MetaIcon = meta.icon;
           return (
             <UnstyledButton
               key={habit.id}
               onClick={() => !locked && toggleCheck(selectedDay, index)}
               aria-pressed={checked}
               disabled={locked}
+              className="glass-surface glass-row lift"
               style={{
                 width: '100%',
                 minHeight: 60,
                 padding: '10px 14px',
                 borderRadius: 18,
                 opacity: locked ? 0.75 : 1,
-                border: '1px solid var(--mantine-color-default-border)',
-                boxShadow: 'var(--mantine-shadow-xs)',
-                transition: 'background 200ms ease, border-color 200ms ease',
-                background: checked
-                  ? 'var(--mantine-color-leaf-light)'
-                  : 'var(--mantine-color-body)',
+                border: '1px solid var(--glass-border)',
+                background: checked ? 'var(--glass-row-bg-checked)' : 'var(--glass-row-bg)',
               }}
             >
               <Group wrap="nowrap" gap="sm" align="center">
@@ -205,22 +202,9 @@ export function TodayView({ selectedDay, onSelectDay }: TodayViewProps) {
                     style={{ pointerEvents: 'none' }}
                   />
                 </span>
-                <Box
-                  aria-hidden
-                  style={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: 12,
-                    flexShrink: 0,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    background: `var(--mantine-color-${meta.color}-light)`,
-                    color: `var(--mantine-color-${meta.color}-7)`,
-                  }}
-                >
-                  <MetaIcon size={21} stroke={1.9} />
-                </Box>
+                {/* v3.1: original per-habit artwork (decorative; the habit
+                    name text beside it is the label). */}
+                <HabitArt habitId={habit.id} size={42} />
                 <Stack gap={0} style={{ flex: 1, minWidth: 0 }}>
                   <Text fw={600} lh={1.3} td={checked ? 'line-through' : undefined}>
                     <Text span c="dimmed" fw={500}>
@@ -264,7 +248,10 @@ export function TodayView({ selectedDay, onSelectDay }: TodayViewProps) {
           gradient={{ from: 'leaf.8', to: 'leaf.7', deg: 90 }}
           leftSection={<IconSend size={19} />}
           onClick={handleSubmit}
-          style={{ boxShadow: '0 10px 24px rgba(30, 108, 48, 0.35)' }}
+          style={{
+            boxShadow:
+              '0 12px 28px rgba(30, 108, 48, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.25)',
+          }}
         >
           {viewingToday ? t('submitDay') : t('submitDayFor')}
         </Button>

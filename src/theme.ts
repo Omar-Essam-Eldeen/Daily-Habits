@@ -42,9 +42,9 @@ export const theme = createTheme({
   shadows: {
     xs: '0 1px 2px rgba(66, 52, 20, 0.06)',
     sm: '0 1px 3px rgba(66, 52, 20, 0.07), 0 6px 16px rgba(66, 52, 20, 0.06)',
-    md: '0 2px 6px rgba(66, 52, 20, 0.08), 0 12px 28px rgba(66, 52, 20, 0.08)',
-    lg: '0 4px 10px rgba(66, 52, 20, 0.09), 0 18px 40px rgba(66, 52, 20, 0.1)',
-    xl: '0 8px 16px rgba(66, 52, 20, 0.11), 0 28px 56px rgba(66, 52, 20, 0.11)',
+    md: '0 2px 6px rgba(66, 52, 20, 0.09), 0 14px 32px rgba(66, 52, 20, 0.1)',
+    lg: '0 4px 12px rgba(66, 52, 20, 0.1), 0 22px 46px rgba(66, 52, 20, 0.12)',
+    xl: '0 10px 20px rgba(66, 52, 20, 0.12), 0 34px 64px rgba(66, 52, 20, 0.13)',
   },
   fontFamily:
     "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Kufi Arabic', 'Noto Sans Arabic', sans-serif",

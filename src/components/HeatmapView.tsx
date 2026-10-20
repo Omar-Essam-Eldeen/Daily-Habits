@@ -29,6 +29,8 @@ import {
   weekCompletion,
 } from '../lib/stats';
 import { customIcon } from './customIcons';
+import { HabitArt } from './HabitArt';
+import { chipArt, heatTileArt } from '../lib/colorArt';
 import { useCountUp } from '../hooks/useCountUp';
 import { useAppData } from '../state/AppDataContext';
 
@@ -115,28 +117,13 @@ export function HeatmapView() {
           const habitPct = percent(done, TOTAL_DAYS);
           const streak = currentStreak(data, index, today);
           const meta = habitMeta(habit.id);
-          const MetaIcon = meta.icon;
           return (
             <Card key={habit.id} withBorder padding="md">
               <Stack gap="sm">
                 <Group justify="space-between" align="flex-start" wrap="nowrap">
                   <Group gap="sm" wrap="nowrap" align="flex-start" style={{ flex: 1, minWidth: 0 }}>
-                    <Box
-                      aria-hidden
-                      style={{
-                        width: 38,
-                        height: 38,
-                        borderRadius: 12,
-                        flexShrink: 0,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        background: `var(--mantine-color-${meta.color}-light)`,
-                        color: `var(--mantine-color-${meta.color}-7)`,
-                      }}
-                    >
-                      <MetaIcon size={20} stroke={1.9} />
-                    </Box>
+                    {/* v3.1: original per-habit artwork (decorative). */}
+                    <HabitArt habitId={habit.id} size={40} />
                     <Stack gap={0} style={{ minWidth: 0 }}>
                       <Text fw={600} lh={1.3}>
                         <Text span c="dimmed" fw={500}>
@@ -198,16 +185,19 @@ export function HeatmapView() {
                             fontSize: 12,
                             fontWeight: 600,
                             transition: 'background 180ms ease, border-color 180ms ease',
-                            border: filled
-                              ? '1px solid var(--mantine-color-leaf-6)'
-                              : '1px solid var(--mantine-color-default-border)',
-                            background: filled
-                              ? 'var(--mantine-color-leaf-6)'
-                              : 'var(--mantine-color-body)',
-                            color: filled ? '#fff' : 'var(--mantine-color-dimmed)',
-                            boxShadow: isToday
-                              ? '0 0 0 2px var(--mantine-color-body), 0 0 0 4px var(--mantine-color-leaf-5)'
-                              : undefined,
+                            // v3.1: per-habit gradient art (see colorArt.ts
+                            // — numeral contrast >= 4.5:1 on every stop).
+                            ...(() => {
+                              const art = heatTileArt(meta.color, filled);
+                              return {
+                                border: `1px solid ${art.borderColor}`,
+                                background: art.background,
+                                color: art.color,
+                                boxShadow: isToday
+                                  ? '0 0 0 2px var(--mantine-color-body), 0 0 0 4px var(--mantine-color-leaf-5)'
+                                  : art.boxShadow,
+                              };
+                            })(),
                           }}
                         >
                           {formatNumber(day, lang)}
@@ -250,8 +240,7 @@ export function HeatmapView() {
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            background: `var(--mantine-color-${habit.color}-light)`,
-                            color: `var(--mantine-color-${habit.color}-7)`,
+                            ...chipArt(habit.color),
                           }}
                         >
                           <Icon size={20} stroke={1.9} />
@@ -319,16 +308,17 @@ export function HeatmapView() {
                                 fontSize: 12,
                                 fontWeight: 600,
                                 transition: 'background 180ms ease, border-color 180ms ease',
-                                border: filled
-                                  ? `1px solid var(--mantine-color-${habit.color}-6)`
-                                  : '1px solid var(--mantine-color-default-border)',
-                                background: filled
-                                  ? `var(--mantine-color-${habit.color}-6)`
-                                  : 'var(--mantine-color-body)',
-                                color: filled ? '#fff' : 'var(--mantine-color-dimmed)',
-                                boxShadow: isToday
-                                  ? '0 0 0 2px var(--mantine-color-body), 0 0 0 4px var(--mantine-color-leaf-5)'
-                                  : undefined,
+                                ...(() => {
+                                  const art = heatTileArt(habit.color, filled);
+                                  return {
+                                    border: `1px solid ${art.borderColor}`,
+                                    background: art.background,
+                                    color: art.color,
+                                    boxShadow: isToday
+                                      ? '0 0 0 2px var(--mantine-color-body), 0 0 0 4px var(--mantine-color-leaf-5)'
+                                      : art.boxShadow,
+                                  };
+                                })(),
                               }}
                             >
                               {formatNumber(day, lang)}

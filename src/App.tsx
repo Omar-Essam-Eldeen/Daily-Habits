@@ -27,7 +27,11 @@ export default function App() {
   }, []);
 
   return (
-    <Container size="sm" px="sm" py="md">
+    <>
+      {/* v3.1 Cinematic Layers: drifting sunrise glow field behind the app
+          (pure decoration — fixed, pointer-transparent, aria-hidden). */}
+      <div className="cinematic-field" aria-hidden="true" />
+      <Container size="sm" px="sm" py="md">
       <Stack gap="md">
         <AppHeader />
 
@@ -59,6 +63,7 @@ export default function App() {
           {t('footerPrivacy')}
         </Text>
       </Stack>
-    </Container>
+      </Container>
+    </>
   );
 }

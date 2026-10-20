@@ -7,6 +7,29 @@ each day, watch the grids fill up, and finish all 21 days.
 Built with **React + Vite + TypeScript + Mantine**. Style: "Clean Social" —
 neutral surfaces, one calm-green accent, rounded cards, pill buttons.
 
+## What's new in v3.1 — "Cinematic Layers" (design only)
+
+No behaviour or data changes — v3.1 is a pure visual stage over v3:
+
+- **New logo & wordmark** — an original sunrise-over-a-leaf mark (the leaf's
+  vein is a check) in the header, on the summary card, in empty states, and
+  regenerated as the PWA icon family (192 / 512 / maskable 512).
+- **Original artwork for the 10 core habits** — a layered, gradient SVG
+  family (mosque at dawn, rising sun, open Qur'an, crescent, Duha sun,
+  heart, circling power-bolt, medallion, prayer beads, star-flame), one per
+  habit in its established colour. Custom habits keep the icon/colour
+  picker, now wearing matching gradient chips.
+- **Layered sunrise fields** behind the app (slow ambient drift, frozen
+  under reduced motion), **glass cards and rows** with warm layered
+  shadows, a **glowing sunrise-gradient progress ring** that pulses once
+  when progress changes, **layered milestone celebrations** (light rays,
+  flash, two confetti depths), **per-habit gradient heatmap tiles** and
+  hover/press micro-depth.
+- Accessibility re-gated on the new surfaces: tile numerals and text keep
+  ≥ 4.5:1 on their actual rendered backgrounds (measured), secondary text
+  was deepened where glass/gradients needed it, and the focus ring is
+  scheme-tuned.
+
 ## What's new in v3
 
 - **My habits (custom habits)** — add your own habits beside the core 10,
