@@ -12,7 +12,7 @@ import {
 } from '../lib/push';
 import { useAppData } from '../state/AppDataContext';
 
-type Note = 'server' | 'denied' | 'error' | null;
+type Note = 'server' | 'denied' | 'dismissed' | 'error' | null;
 
 /**
  * v3 phone reminders (Web Push). Priming done right: the permission prompt
@@ -30,6 +30,9 @@ export function PushSettings() {
   const [checking, setChecking] = useState(true);
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState<Note>(null);
+  /** v3.1.4: the real failure detail from the push layer (step + error),
+   *  rendered under the banner so a failure can be told apart at a glance. */
+  const [noteDetail, setNoteDetail] = useState<string | null>(null);
   const [time, setTime] = useState<string>(data.settings.reminderTime ?? DEFAULT_PUSH_TIME);
 
   useEffect(() => {
@@ -50,6 +53,7 @@ export function PushSettings() {
   const handleEnable = async () => {
     setBusy(true);
     setNote(null);
+    setNoteDetail(null);
     const chosen = /^\d{2}:\d{2}$/.test(time) ? time : DEFAULT_PUSH_TIME;
     if (data.settings.reminderTime !== chosen) setReminderTime(chosen);
     const result = await enablePush({ reminderTime: chosen, language: lang });
@@ -58,9 +62,10 @@ export function PushSettings() {
       setEnabled(true);
       return;
     }
+    setNoteDetail(result.detail ?? null);
     if (result.reason === 'server') setNote('server');
     else if (result.reason === 'denied') setNote('denied');
-    else if (result.reason === 'unsupported') setNote('error');
+    else if (result.reason === 'dismissed') setNote('dismissed');
     else setNote('error');
   };
 
@@ -70,6 +75,7 @@ export function PushSettings() {
     setBusy(false);
     setEnabled(false);
     setNote(null);
+    setNoteDetail(null);
   };
 
   const handleTimeChange = (value: string) => {
@@ -161,10 +167,20 @@ export function PushSettings() {
                 {t('pushDenied')}
               </Alert>
             )}
+            {note === 'dismissed' && (
+              <Alert color="yellow" variant="light" icon={<IconInfoCircle size={16} />}>
+                {t('pushDismissed')}
+              </Alert>
+            )}
             {note === 'error' && (
               <Alert color="red" variant="light" icon={<IconInfoCircle size={16} />}>
                 {t('pushGenericError')}
               </Alert>
+            )}
+            {note !== null && noteDetail && (
+              <Text size="xs" c="dimmed" dir="ltr" style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
+                {t('pushErrorDetails')}: {noteDetail}
+              </Text>
             )}
           </>
         )}

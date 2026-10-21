@@ -88,27 +88,139 @@ export interface EnablePushInput {
 
 export type EnablePushResult =
   | { ok: true }
-  | { ok: false; reason: 'unsupported' | 'denied' | 'server' | 'error' };
+  | {
+      ok: false;
+      reason: 'unsupported' | 'denied' | 'dismissed' | 'server' | 'error';
+      /** v3.1.4: human-readable diagnostics (step + error name/message),
+       *  shown in the settings card so a failure is identifiable instead of
+       *  hiding behind one generic banner. */
+      detail?: string;
+    };
+
+/** The enable flow as named steps — a failure reports WHICH step died. */
+type EnableStep =
+  | 'support'
+  | 'permission'
+  | 'sw-ready'
+  | 'existing'
+  | 'subscribe'
+  | 'server-post'
+  | 'server-contract';
+
+function describeError(step: EnableStep, err: unknown): string {
+  if (err instanceof Error) return `${step}: ${err.name} — ${err.message}`;
+  return `${step}: ${String(err)}`;
+}
+
+/** Race a promise against a timeout so a stuck step reports itself instead
+ *  of spinning forever (serviceWorker.ready can hang on a broken SW). */
+function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<never>((_, reject) => {
+      setTimeout(() => {
+        const err = new Error(`${label} timed out after ${ms}ms`);
+        err.name = 'TimeoutError';
+        reject(err);
+      }, ms);
+    }),
+  ]);
+}
+
+/** True when an existing subscription was created with OUR VAPID key. A
+ *  subscription made under a different key (stale test state, rotated key)
+ *  can never receive our sends — the server would sign with a key the
+ *  subscription doesn't expect — so it must be replaced, not reused. */
+function subscriptionKeyMatches(sub: PushSubscription): boolean {
+  const key = sub.options?.applicationServerKey;
+  if (!key) return false;
+  const mine = urlBase64ToUint8Array(VAPID_PUBLIC_KEY);
+  const theirs = new Uint8Array(key);
+  if (mine.length !== theirs.length) return false;
+  return mine.every((b, i) => b === theirs[i]);
+}
 
 /**
  * Ask for permission (call ONLY from a user tap — never on first open),
  * subscribe via PushManager, and register the subscription with the server.
+ * v3.1.4: every failure path carries a `detail` (step + real error) that
+ * the settings card displays — desktop browsers fail this flow in several
+ * distinct ways (dismissed prompt, stale keyed subscription, push-service
+ * AbortError) and a silent catch-all made them indistinguishable.
  */
 export async function enablePush(input: EnablePushInput): Promise<EnablePushResult> {
+  let step: EnableStep = 'support';
   try {
-    if (pushSupport() === 'no-api') return { ok: false, reason: 'unsupported' };
+    if (pushSupport() === 'no-api') {
+      return {
+        ok: false,
+        reason: 'unsupported',
+        detail: 'support: PushManager / Notification / serviceWorker missing in this browser',
+      };
+    }
+
+    step = 'permission';
     const permission = await Notification.requestPermission();
-    if (permission !== 'granted') return { ok: false, reason: 'denied' };
+    if (permission === 'denied') {
+      return {
+        ok: false,
+        reason: 'denied',
+        detail: 'permission: the browser reports notifications denied for this site',
+      };
+    }
+    if (permission !== 'granted') {
+      // 'default' — the prompt was closed without choosing. NOT a denial;
+      // the user can simply tap Enable again.
+      return {
+        ok: false,
+        reason: 'dismissed',
+        detail: `permission: prompt closed without a choice (state: ${permission})`,
+      };
+    }
 
-    const registration = await navigator.serviceWorker.ready;
-    const existing = await registration.pushManager.getSubscription();
-    const subscription =
-      existing ??
-      (await registration.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY) as BufferSource,
-      }));
+    step = 'sw-ready';
+    const registration = await withTimeout(
+      navigator.serviceWorker.ready,
+      10000,
+      'serviceWorker.ready',
+    );
+    if (!registration.active) {
+      const err = new Error('service worker registration has no active worker yet');
+      err.name = 'InvalidStateError';
+      throw err;
+    }
 
+    step = 'existing';
+    let existing = await registration.pushManager.getSubscription();
+    if (existing && !subscriptionKeyMatches(existing)) {
+      // Stale subscription under a different key — drop it and subscribe
+      // fresh below, instead of registering an undeliverable endpoint.
+      await existing.unsubscribe().catch(() => undefined);
+      existing = null;
+    }
+
+    step = 'subscribe';
+    let subscription = existing;
+    if (!subscription) {
+      const subscribeOnce = () =>
+        registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY) as BufferSource,
+        });
+      try {
+        subscription = await subscribeOnce();
+      } catch (firstErr) {
+        // Desktop browsers (Edge especially) intermittently fail the first
+        // subscribe with a transient AbortError ("push service error" /
+        // "no active Service Worker"). One retry after re-awaiting the
+        // registration clears most of them.
+        console.warn('[push] first subscribe attempt failed, retrying once', firstErr);
+        await withTimeout(navigator.serviceWorker.ready, 10000, 'serviceWorker.ready');
+        subscription = await subscribeOnce();
+      }
+    }
+
+    step = 'server-post';
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Africa/Cairo';
     const res = await postJSON('/api/subscribe', {
       subscription: subscription.toJSON(),
@@ -119,26 +231,35 @@ export async function enablePush(input: EnablePushInput): Promise<EnablePushResu
     // Require the endpoint's real JSON contract — a static host's SPA
     // fallback can answer 200 HTML for /api/*, which must NOT count as
     // "reminders activated".
+    step = 'server-contract';
     let contractOk = res.ok;
+    let contractNote = '';
     if (contractOk) {
       try {
         const json: unknown = await res.json();
         contractOk =
           typeof json === 'object' && json !== null && (json as { ok?: unknown }).ok === true;
+        if (!contractOk) contractNote = ' (JSON without ok:true)';
       } catch {
         contractOk = false;
+        contractNote = ' (response was not JSON)';
       }
     }
     if (!contractOk) {
       // Stay locally subscribed? No — without the server record nothing can
       // be sent, so roll back to keep the UI honest.
       await subscription.unsubscribe().catch(() => undefined);
-      return { ok: false, reason: 'server' };
+      return {
+        ok: false,
+        reason: 'server',
+        detail: `server-contract: HTTP ${res.status}${contractNote}`,
+      };
     }
     savePushState({ endpoint: subscription.endpoint });
     return { ok: true };
-  } catch {
-    return { ok: false, reason: 'error' };
+  } catch (err) {
+    console.error('[push] enable failed:', describeError(step, err), err);
+    return { ok: false, reason: 'error', detail: describeError(step, err) };
   }
 }
 

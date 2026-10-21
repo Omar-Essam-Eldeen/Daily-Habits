@@ -129,6 +129,9 @@ export const en = {
   pushServerOff:
     'Phone reminders are not activated on the server yet, so nothing was switched on. Your in-app reminder still works — this will light up once the free reminder service is connected.',
   pushGenericError: 'Something went wrong while enabling reminders. Please try again.',
+  pushDismissed:
+    'The permission prompt was closed before a choice was made. Tap Enable and choose "Allow" to switch reminders on.',
+  pushErrorDetails: 'Technical details',
   pushNotActivatedNote: 'Reminders not activated yet on the server — in-app reminder only for now.',
   customSummaryLine: 'My habits total ticks',
 };
@@ -260,6 +263,8 @@ export const ar: Record<TranslationKey, string> = {
   pushServerOff:
     'تذكيرات الهاتف غير مفعّلة على الخادم بعد، لذا لم يتم تشغيل شيء. التذكير داخل التطبيق ما زال يعمل — وستعمل هذه الميزة فور ربط خدمة التذكير المجانية.',
   pushGenericError: 'حدث خطأ أثناء تفعيل التذكيرات. حاول مرة أخرى.',
+  pushDismissed: 'أُغلق طلب الإذن قبل أن تختار شيئًا. اضغط «فعّل» واختر «سماح» لتشغيل التذكيرات.',
+  pushErrorDetails: 'التفاصيل التقنية',
   pushNotActivatedNote: 'التذكيرات غير مفعّلة على الخادم بعد — التذكير داخل التطبيق فقط حاليًا.',
   customSummaryLine: 'مجموع علامات عاداتي الخاصة',
 };
