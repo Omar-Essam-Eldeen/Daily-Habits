@@ -28,8 +28,9 @@
     "build": "tsc --noEmit -p tsconfig.json && vite build",
     "dev": "vite",
     "icons": "node scripts/generate-icons.mjs",
+    "brand": "python3 scripts/generate-brand.py",
     "preview": "vite preview"
   },
   "type": "module",
-  "version": "3.1.4"
+  "version": "3.2.0"
 }

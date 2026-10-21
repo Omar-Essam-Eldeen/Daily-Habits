@@ -26,6 +26,23 @@ export default function App() {
     setSelectedDay((d) => Math.min(TOTAL_DAYS, Math.max(1, d)));
   }, []);
 
+  // v3.2 boot splash: index.html paints Mr. Magic's splash artwork before
+  // any JS loads; once the app has mounted, hold it for a short minimum
+  // (250ms under reduced motion, ~1.15s otherwise) so it reads as a splash
+  // and not a flicker, then fade it out and remove it. A failsafe timer in
+  // index.html removes it even if this never runs.
+  useEffect(() => {
+    const el = document.getElementById('boot-splash');
+    if (!el) return;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const wait = Math.max(0, (reduce ? 250 : 1150) - performance.now());
+    const t1 = window.setTimeout(() => {
+      el.classList.add('boot-hide');
+      window.setTimeout(() => el.remove(), 600);
+    }, wait);
+    return () => window.clearTimeout(t1);
+  }, []);
+
   return (
     <>
       {/* v3.1 Cinematic Layers: drifting sunrise glow field behind the app

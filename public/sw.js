@@ -1,11 +1,11 @@
-/* 21 Habits — service worker (v3.1.4).
+/* 21 Habits — service worker (v3.2.0).
    Strategy: stale-while-revalidate for same-origin GET requests so the
    app shell keeps working offline after the first visit.
    Push (v3): receives the nightly reminder from the server and opens the
    app when tapped. Reminder payloads are generic — they never contain
    habit data (habit data never leaves the device).
    Bump CACHE_NAME on release. */
-const CACHE_NAME = 'habits-app-v314';
+const CACHE_NAME = 'habits-app-v320';
 
 self.addEventListener('install', (event) => {
   event.waitUntil(

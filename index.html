@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#2f9e44" />
+    <meta name="theme-color" content="#14532d" />
     <meta
       name="description"
       content="21 Habits — a warm 21-day challenge tracker: the 10 daily habits, your own custom habits, a daily submit ritual, and optional phone reminders. Local-only, bilingual (English / Arabic), light and dark."
@@ -19,10 +19,65 @@
     <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
     <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <!-- v3.2: iOS home-screen launch images (Mr. Magic's splash artwork) -->
+    <link rel="apple-touch-startup-image" href="/splash/startup-750x1334.jpg" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
+    <link rel="apple-touch-startup-image" href="/splash/startup-828x1792.jpg" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
+    <link rel="apple-touch-startup-image" href="/splash/startup-1125x2436.jpg" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" />
+    <link rel="apple-touch-startup-image" href="/splash/startup-1170x2532.jpg" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" />
+    <link rel="apple-touch-startup-image" href="/splash/startup-1179x2556.jpg" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" />
+    <link rel="apple-touch-startup-image" href="/splash/startup-1242x2688.jpg" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" />
+    <link rel="apple-touch-startup-image" href="/splash/startup-1290x2796.jpg" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" />
     <title>21 Habits — ٢١ يوم عادات</title>
+    <style>
+      /* v3.2 boot splash: painted by the HTML itself, before any JS or CSS
+         bundles arrive, so opening the app shows the artwork instantly.
+         App.tsx fades it out once the app has mounted; the inline script
+         below is a failsafe that removes it even if the app fails to load. */
+      #boot-splash {
+        position: fixed;
+        inset: 0;
+        z-index: 2000;
+        background: #060d12;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: opacity 0.45s ease;
+      }
+      #boot-splash img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        display: block;
+      }
+      #boot-splash.boot-hide {
+        opacity: 0;
+        pointer-events: none;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        #boot-splash {
+          transition-duration: 0.1s;
+        }
+      }
+    </style>
   </head>
   <body>
+    <div id="boot-splash" aria-hidden="true">
+      <img src="/splash/splash.jpg" alt="" />
+    </div>
     <div id="root"></div>
+    <script>
+      setTimeout(function () {
+        var s = document.getElementById('boot-splash');
+        if (s) {
+          s.classList.add('boot-hide');
+          setTimeout(function () {
+            s.remove();
+          }, 600);
+        }
+      }, 4500);
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
