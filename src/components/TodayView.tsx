@@ -5,7 +5,6 @@ import {
   Box,
   Button,
   Card,
-  Checkbox,
   Group,
   RingProgress,
   Stack,
@@ -29,6 +28,7 @@ import { dayCompletion, isChecked, isDayComplete, submissionFor } from '../lib/s
 import { useCountUp } from '../hooks/useCountUp';
 import { useAppData } from '../state/AppDataContext';
 import { Celebration } from './Celebration';
+import { TickBox } from './TickBox';
 import { CustomHabitsSection } from './CustomHabitsSection';
 import { HabitArt } from './HabitArt';
 import { DaySelector } from './DaySelector';
@@ -123,7 +123,9 @@ export function TodayView({ selectedDay, onSelectDay }: TodayViewProps) {
             {formatDayLabel(dateOfDay(data.startDate, selectedDay), locale)}
           </Text>
         </Stack>
-        {viewingToday && <Badge color="leaf">{t('today')}</Badge>}
+        {/* v3.1.2: leaf.8 (not leaf.6) — white on #2f9e44 measured 3.44:1
+            (axe color-contrast); white on leaf.8 is ~6.4:1 in both schemes. */}
+        {viewingToday && <Badge color="leaf.8">{t('today')}</Badge>}
       </Group>
 
       {beforeStart && (
@@ -191,16 +193,12 @@ export function TodayView({ selectedDay, onSelectDay }: TodayViewProps) {
               }}
             >
               <Group wrap="nowrap" gap="sm" align="center">
+                {/* Decorative tick box only — the row button is the real
+                    control (aria-pressed + habit name). v3.1.2: a pure-visual
+                    TickBox span — no <input> inside the button at all (axe
+                    "label" + "nested-interactive" both gone by construction). */}
                 <span key={String(checked)} className={checked ? 'check-pop' : undefined} aria-hidden="true">
-                  <Checkbox
-                    checked={checked}
-                    readOnly
-                    tabIndex={-1}
-                    size="lg"
-                    radius="md"
-                    color="leaf"
-                    style={{ pointerEvents: 'none' }}
-                  />
+                  <TickBox checked={checked} />
                 </span>
                 {/* v3.1: original per-habit artwork (decorative; the habit
                     name text beside it is the label). */}

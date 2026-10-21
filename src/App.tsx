@@ -33,8 +33,14 @@ export default function App() {
       <div className="cinematic-field" aria-hidden="true" />
       <Container size="sm" px="sm" py="md">
       <Stack gap="md">
-        <AppHeader />
+        {/* v3.1.2 landmarks: exactly one banner, one main, one contentinfo —
+            every piece of page content lives inside one of them (axe
+            "landmark-one-main" / "region"). */}
+        <header>
+          <AppHeader />
+        </header>
 
+        <main>
         <Tabs defaultValue="today" color="leaf">
           <Tabs.List grow>
             <Tabs.Tab value="today" leftSection={<IconListCheck size={16} />}>
@@ -58,10 +64,13 @@ export default function App() {
             <SettingsView />
           </Tabs.Panel>
         </Tabs>
+        </main>
 
-        <Text size="xs" c="dimmed" ta="center" pb="sm">
-          {t('footerPrivacy')}
-        </Text>
+        <footer>
+          <Text size="xs" c="dimmed" ta="center" pb="sm">
+            {t('footerPrivacy')}
+          </Text>
+        </footer>
       </Stack>
       </Container>
     </>

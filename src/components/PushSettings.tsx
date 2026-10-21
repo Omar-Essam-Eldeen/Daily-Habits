@@ -141,7 +141,7 @@ export function PushSettings() {
               </Group>
             ) : (
               <Button
-                color="leaf"
+                color="leaf.8"
                 radius="xl"
                 loading={busy}
                 leftSection={<IconBell size={16} />}

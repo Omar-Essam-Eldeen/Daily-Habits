@@ -190,7 +190,7 @@ export function DaySummaryCard({ day, submission }: Props) {
             <IconTrophy size={20} color="var(--mantine-color-leaf-7)" aria-hidden />
             <Text fw={700}>{t('summaryTitle')}</Text>
           </Group>
-          <Badge color="leaf" variant="filled" leftSection={<IconCheck size={12} />}>
+          <Badge color="leaf.8" variant="filled" leftSection={<IconCheck size={12} />}>
             {t('submittedBadge')}
           </Badge>
         </Group>
@@ -245,7 +245,7 @@ export function DaySummaryCard({ day, submission }: Props) {
           <Button
             size="sm"
             radius="xl"
-            color="leaf"
+            color="leaf.8"
             leftSection={<IconShare size={15} />}
             onClick={() => void handleShare()}
           >

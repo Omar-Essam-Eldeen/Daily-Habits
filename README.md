@@ -8,6 +8,7 @@ Built with **React + Vite + TypeScript + Mantine**. Style: "Clean Social" —
 neutral surfaces, one calm-green accent, rounded cards, pill buttons.
 
 ## What's new in v3.1 — "Cinematic Layers" (design only)
+- **v3.1.2 (a11y polish, "axe-zero"):** the panel now comes back completely clean under axe-core's full ruleset (WCAG 2.0/2.1 A+AA + best-practice) on Today (EN/AR), Progress and Settings, in light and dark. Proper landmarks (`<header>` / one `<main>` / `<footer>`); every progress bar has an accessible name; white-on-leaf contrast fixed (3.44:1 -> ~6.4:1 via the leaf.8 shade on filled badges/buttons); and the decorative tick box is no longer a hidden `<input>` at all -- it is a pure-visual span that reproduces the old checkbox rendering pixel-for-pixel, so habit rows contain no nested interactive elements.
 - **v3.1.1 (a11y hotfix):** the decorative tick-box inside each habit row is now hidden from assistive tech (aria-hidden wrapper) — it was rendering as an unlabelled checkbox input and tripping axe-core's critical "label" rule; the row button remains the single real control. Verified with axe-core: zero `label` and zero critical violations on Today (EN/AR), Progress and Settings.
 
 

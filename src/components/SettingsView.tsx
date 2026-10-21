@@ -279,7 +279,7 @@ export function SettingsView() {
             <Button variant="default" onClick={() => setPendingImport(null)}>
               {t('cancel')}
             </Button>
-            <Button color="leaf" onClick={confirmImport}>
+            <Button color="leaf.8" onClick={confirmImport}>
               {t('replace')}
             </Button>
           </Group>

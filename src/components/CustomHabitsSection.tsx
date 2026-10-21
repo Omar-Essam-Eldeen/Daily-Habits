@@ -4,7 +4,6 @@ import {
   Badge,
   Box,
   Button,
-  Checkbox,
   Group,
   Modal,
   SimpleGrid,
@@ -24,6 +23,7 @@ import { todayDayNumber } from '../lib/dates';
 import { formatNumber } from '../i18n/translations';
 import { useAppData, type CustomHabitDraft } from '../state/AppDataContext';
 import { CUSTOM_ICON_KEYS, customIcon } from './customIcons';
+import { TickBox } from './TickBox';
 import { chipArt } from '../lib/colorArt';
 import { LogoMark } from './Logo';
 
@@ -116,17 +116,12 @@ export function CustomHabitsSection({ selectedDay, locked }: Props) {
               style={{ flex: 1, minWidth: 0, minHeight: 60, padding: '10px 6px 10px 14px' }}
             >
               <Group wrap="nowrap" gap="sm" align="center">
+                {/* Decorative tick box only — the row button is the real
+                    control (aria-pressed + aria-label). v3.1.2: a pure-visual
+                    TickBox span in the habit's own colour — no <input> inside
+                    the button at all (axe "label" + "nested-interactive"). */}
                 <span key={String(checked)} className={checked ? 'check-pop' : undefined} aria-hidden="true">
-                  <Checkbox
-                    checked={checked}
-                    readOnly
-                    tabIndex={-1}
-                    size="lg"
-                    radius="md"
-                    color={habit.color}
-                    style={{ pointerEvents: 'none' }}
-                    aria-hidden
-                  />
+                  <TickBox checked={checked} color={habit.color} />
                 </span>
                 <Box
                   aria-hidden
@@ -387,7 +382,7 @@ function HabitEditor({
               {t('cancel')}
             </Button>
             <Button
-              color="leaf"
+              color="leaf.8"
               disabled={!title.trim()}
               onClick={() =>
                 onSave({ title, note: note.trim() ? note : null, icon, color })

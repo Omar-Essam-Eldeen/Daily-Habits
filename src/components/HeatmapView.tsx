@@ -62,7 +62,9 @@ export function HeatmapView() {
               {formatNumber(animatedPct, lang)}%
             </Text>
           </Group>
-          <Progress value={pct} color="leaf" size="lg" radius="xl" />
+          {/* v3.1.2: every Mantine progressbar gets an accessible name
+              (axe "aria-progressbar-name") — the visible heading text. */}
+          <Progress value={pct} color="leaf" size="lg" radius="xl" aria-label={t('overallProgress')} />
           <Text size="sm" c="dimmed">
             {formatNumber(total, lang)} {t('of')} {formatNumber(TOTAL_CHECKS, lang)}{' '}
             {t('checksLabel')}
@@ -94,7 +96,13 @@ export function HeatmapView() {
                     {formatNumber(weekPct, lang)}%
                   </Text>
                 </Group>
-                <Progress value={weekPct} color="leaf" size="md" radius="xl" />
+                <Progress
+                  value={weekPct}
+                  color="leaf"
+                  size="md"
+                  radius="xl"
+                  aria-label={`${t('week')} ${formatNumber(week + 1, lang)}`}
+                />
               </Stack>
             );
           })}
@@ -150,7 +158,7 @@ export function HeatmapView() {
                   )}
                 </Group>
 
-                <Progress value={habitPct} color={meta.color} size="sm" radius="xl" />
+                <Progress value={habitPct} color={meta.color} size="sm" radius="xl" aria-label={habit.title[lang]} />
 
                 <SimpleGrid cols={7} spacing={6}>
                   {Array.from({ length: TOTAL_DAYS }, (_, i) => i + 1).map((day) => {
@@ -273,7 +281,7 @@ export function HeatmapView() {
                       )}
                     </Group>
 
-                    <Progress value={habitPct} color={habit.color} size="sm" radius="xl" />
+                    <Progress value={habitPct} color={habit.color} size="sm" radius="xl" aria-label={habit.title} />
 
                     <SimpleGrid cols={7} spacing={6}>
                       {Array.from({ length: TOTAL_DAYS }, (_, i) => i + 1).map((day) => {
