@@ -7,12 +7,14 @@ import { SettingsView } from './components/SettingsView';
 import { TodayView } from './components/TodayView';
 import { useLanguage } from './i18n/LanguageContext';
 import { todayDayNumber } from './lib/dates';
+import { isNativeApp, nativeRemindersEnabled, syncNativeReminder } from './lib/native';
+import { DEFAULT_PUSH_TIME } from './lib/pushConfig';
 import { TOTAL_DAYS } from './lib/habits';
 import { useAppData } from './state/AppDataContext';
 
 export default function App() {
   const { data } = useAppData();
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
 
   // Open on today's day (computed from the start date, clamped 1..21).
   const [selectedDay, setSelectedDay] = useState<number>(() => todayDayNumber(data.startDate));
@@ -42,6 +44,24 @@ export default function App() {
     }, wait);
     return () => window.clearTimeout(t1);
   }, []);
+
+  // v3.3.0 native shell: keep the on-device reminder in sync with state.
+  // Inert on the web (no Capacitor bridge there). Re-arms whenever the
+  // reminder time, today's submission or the language changes, so a day
+  // already submitted never rings and the text follows the app's language.
+  const submittedToday = Boolean(data.submissions[String(todayDayNumber(data.startDate))]);
+  const reminderTime = data.settings.reminderTime;
+  useEffect(() => {
+    if (!isNativeApp()) return;
+    void syncNativeReminder({
+      enabled: nativeRemindersEnabled(),
+      time: reminderTime ?? DEFAULT_PUSH_TIME,
+      submittedToday,
+      title: t('pushNotifTitle'),
+      body: t('pushNotifBody'),
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reminderTime, submittedToday, lang]);
 
   return (
     <>

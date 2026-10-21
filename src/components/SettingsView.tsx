@@ -31,7 +31,9 @@ import { localeFor } from '../i18n/translations';
 import { TOTAL_DAYS } from '../lib/habits';
 import { sanitizeAppData, type AppData } from '../lib/storage';
 import { useAppData } from '../state/AppDataContext';
+import { NativeReminderSettings } from './NativeReminderSettings';
 import { PushSettings } from './PushSettings';
+import { isNativeApp } from '../lib/native';
 
 /**
  * Settings (v2): grouped into Preferences (language + appearance),
@@ -206,7 +208,7 @@ export function SettingsView() {
         </Stack>
       </Card>
 
-      <PushSettings />
+      {isNativeApp() ? <NativeReminderSettings /> : <PushSettings />}
 
       <Card withBorder padding="md">
         <Stack gap="sm">

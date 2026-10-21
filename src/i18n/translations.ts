@@ -133,6 +133,14 @@ export const en = {
     'The permission prompt was closed before a choice was made. Tap Enable and choose "Allow" to switch reminders on.',
   pushErrorDetails: 'Technical details',
   pushNotActivatedNote: 'Reminders not activated yet on the server — in-app reminder only for now.',
+  pushNativeHelp:
+    'This app schedules its own reminders right on your device — no account and no server involved. It rings once at your reminder time on days you have not submitted yet.',
+  pushNativeNote: 'On-device reminders are on',
+  pushNativeDenied:
+    'Notifications are blocked for this app. Allow them in Android Settings \u2192 Apps \u2192 21 Habits \u2192 Notifications, then switch this on again.',
+  pushNotifTitle: "Time for today's habits",
+  pushNotifBody:
+    "You have not submitted today yet — open the app and tick what you have done. A little progress still counts.",
   customSummaryLine: 'My habits total ticks',
 };
 
@@ -266,6 +274,13 @@ export const ar: Record<TranslationKey, string> = {
   pushDismissed: 'أُغلق طلب الإذن قبل أن تختار شيئًا. اضغط «فعّل» واختر «سماح» لتشغيل التذكيرات.',
   pushErrorDetails: 'التفاصيل التقنية',
   pushNotActivatedNote: 'التذكيرات غير مفعّلة على الخادم بعد — التذكير داخل التطبيق فقط حاليًا.',
+  pushNativeHelp:
+    'يقوم هذا التطبيق بجدولة تذكيراته بنفسه على جهازك — بدون حساب وبدون خادم. يرن مرة واحدة في وقت التذكير في الأيام التي لم تُرسلها بعد.',
+  pushNativeNote: 'تذكيرات الجهاز مفعّلة',
+  pushNativeDenied:
+    'الإشعارات محظورة لهذا التطبيق. اسمح بها من إعدادات أندرويد ← التطبيقات ← ٢١ عادة ← الإشعارات، ثم فعّل هذا الخيار مجددًا.',
+  pushNotifTitle: 'حان وقت عادات اليوم',
+  pushNotifBody: 'لم تُرسل يومك بعد — افتح التطبيق وعلّم ما أنجزته. حتى التقدم البسيط يُحتسب.',
   customSummaryLine: 'مجموع علامات عاداتي الخاصة',
 };
 
