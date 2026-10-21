@@ -7,7 +7,7 @@ import {
   subKey,
   subscriptionId,
   type StoredSubscription,
-} from './_lib';
+} from './_lib.js';
 
 /**
  * POST /api/subscribe — register (or refresh) this device's push

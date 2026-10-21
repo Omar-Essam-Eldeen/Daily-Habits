@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { redis, redisConfig, subKey, subscriptionId } from './_lib';
+import { redis, redisConfig, subKey, subscriptionId } from './_lib.js';
 
 /** POST /api/unsubscribe — remove this device's subscription record. */
 export default async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {

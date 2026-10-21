@@ -8,7 +8,7 @@ import {
   submittedKey,
   subscriptionId,
   type StoredSubscription,
-} from './_lib';
+} from './_lib.js';
 
 /**
  * POST /api/mark-submitted — the client pings this when the user submits

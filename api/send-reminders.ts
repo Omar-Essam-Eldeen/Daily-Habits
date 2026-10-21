@@ -10,7 +10,7 @@ import {
   subKey,
   submittedKey,
   type StoredSubscription,
-} from './_lib';
+} from './_lib.js';
 
 // Raw body needed to verify QStash signatures.
 export const config = { api: { bodyParser: false } };
